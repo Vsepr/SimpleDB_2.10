@@ -21,7 +21,7 @@ import simpledb.file.*;
 public class BufferMgr {
    private static final long MAX_TIME = 10000; // 10 seconds
    private BasicBufferMgr bufferMgr;
-   
+
    /**
     * Creates a new buffer manager having the specified 
     * number of buffers.
@@ -42,7 +42,7 @@ public class BufferMgr {
    /**
     * Pins a buffer to the specified block, potentially
     * waiting until a buffer becomes available.
-    * If no buffer becomes available within a fixed 
+    * If no buffer becomes available within a fixed
     * time period, then a {@link BufferAbortException} is thrown.
     * @param blk a reference to a disk block
     * @return the buffer pinned to that block
@@ -63,11 +63,11 @@ public class BufferMgr {
          throw new BufferAbortException();
       }
    }
-   
+
    /**
-    * Pins a buffer to a new block in the specified file, 
+    * Pins a buffer to a new block in the specified file,
     * potentially waiting until a buffer becomes available.
-    * If no buffer becomes available within a fixed 
+    * If no buffer becomes available within a fixed
     * time period, then a {@link BufferAbortException} is thrown.
     * @param filename the name of the file
     * @param fmtr the formatter used to initialize the page
@@ -90,9 +90,9 @@ public class BufferMgr {
          throw new BufferAbortException();
       }
    }
-   
+
    /**
-    * Unpins the specified buffer. 
+    * Unpins the specified buffer.
     * If the buffer's pin count becomes 0,
     * then the threads on the wait list are notified.
     * @param buff the buffer to be unpinned
@@ -102,7 +102,7 @@ public class BufferMgr {
       if (!buff.isPinned())
          notifyAll();
    }
-   
+
    /**
     * Flushes the dirty buffers modified by the specified transaction.
     * @param txnum the transaction's id number
@@ -110,7 +110,7 @@ public class BufferMgr {
    public void flushAll(int txnum) {
       bufferMgr.flushAll(txnum);
    }
-   
+
    /**
     * Returns the number of available (ie unpinned) buffers.
     * @return the number of available buffers
@@ -118,7 +118,7 @@ public class BufferMgr {
    public int available() {
       return bufferMgr.available();
    }
-   
+
    private boolean waitingTooLong(long starttime) {
       return System.currentTimeMillis() - starttime > MAX_TIME;
    }

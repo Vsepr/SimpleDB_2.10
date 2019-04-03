@@ -2,7 +2,7 @@ import java.sql.*;
 import simpledb.remote.SimpleDriver;
 
 public class StudentMajor {
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 		Connection conn = null;
 		try {
 			// Step 1: connect to database server
@@ -12,8 +12,8 @@ public class StudentMajor {
 			// Step 2: execute the query
 			Statement stmt = conn.createStatement();
 			String qry = "select SName, DName "
-			           + "from DEPT, STUDENT "
-			           + "where DName = DName";
+					+ "from DEPT, STUDENT "
+					+ "where MajorId = DId";
 			ResultSet rs = stmt.executeQuery(qry);
 
 			// Step 3: loop through the result set

@@ -27,21 +27,24 @@ public class Buffer {
    private int logSequenceNumber = -1; // negative means no corresponding log record
 
    /**
-    * Creates a new buffer, wrapping a new 
-    * {@link simpledb.file.Page page}.  
-    * This constructor is called exclusively by the 
-    * class {@link BasicBufferMgr}.   
-    * It depends on  the 
+    * Creates a new buffer, wrapping a new
+    * {@link simpledb.file.Page page}.
+    * This constructor is called exclusively by the
+    * class {@link BasicBufferMgr}.
+    * It depends on  the
     * {@link simpledb.log.LogMgr LogMgr} object
     * that it gets from the class
     * {@link simpledb.server.SimpleDB}.
     * That object is created during system initialization.
-    * Thus this constructor cannot be called until 
+    * Thus this constructor cannot be called until
     * {@link simpledb.server.SimpleDB#initFileAndLogMgr(String)} or
     * is called first.
     */
 
    // CS4432-Project1: add the necessity for a buffer to also be given an index
+   public Buffer() {
+      lastTimeUsed = new Date();
+   }
    public Buffer(int index) {
       bufferIndex = index;
       lastTimeUsed = new Date();
@@ -106,7 +109,7 @@ public class Buffer {
    public void setInt(int offset, int val, int txnum, int lsn) {
       modifiedBy = txnum;
       if (lsn >= 0)
-	      logSequenceNumber = lsn;
+         logSequenceNumber = lsn;
       contents.setInt(offset, val);
    }
 
@@ -127,7 +130,7 @@ public class Buffer {
    public void setString(int offset, String val, int txnum, int lsn) {
       modifiedBy = txnum;
       if (lsn >= 0)
-	      logSequenceNumber = lsn;
+         logSequenceNumber = lsn;
       contents.setString(offset, val);
    }
 
