@@ -12,6 +12,7 @@ public class ChangeMajor {
 			String cmd = "update STUDENT set MajorId=30 "
 			           + "where SName = 'amy'";
 			stmt.executeUpdate(cmd);
+			System.out.println(cmd);
 			System.out.println("Amy is now a drama major.");
 		}
 		catch(SQLException e) {

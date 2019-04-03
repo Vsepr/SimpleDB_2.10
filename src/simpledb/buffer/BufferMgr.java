@@ -38,7 +38,7 @@ public class BufferMgr {
    public BufferMgr(int numbuffers) {
       bufferMgr = new BasicBufferMgr(numbuffers);
    }
-   
+
    /**
     * Pins a buffer to the specified block, potentially
     * waiting until a buffer becomes available.
@@ -83,6 +83,7 @@ public class BufferMgr {
          }
          if (buff == null)
             throw new BufferAbortException();
+
          return buff;
       }
       catch(InterruptedException e) {
@@ -120,5 +121,10 @@ public class BufferMgr {
    
    private boolean waitingTooLong(long starttime) {
       return System.currentTimeMillis() - starttime > MAX_TIME;
+   }
+
+   // CS4432-Project1: toString for task 2.5
+   public String toString() {
+      return bufferMgr.toString();
    }
 }

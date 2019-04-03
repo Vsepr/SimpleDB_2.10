@@ -1,6 +1,8 @@
 package simpledb.buffer;
 
+// CS4432-Project1: Importing to utilize linkedlists and hashtables
 import simpledb.file.*;
+import java.util.*;
 
 /**
  * Manages the pinning and unpinning of buffers to blocks.
@@ -8,8 +10,13 @@ import simpledb.file.*;
  *
  */
 class BasicBufferMgr {
+   // CS4432-Project1: freeFrames - Holds the indices which we know to be free within the bufferpool
+   //                  blockFrame - Hashtable which will store the block number as a key, and the value
+   //                               will be the index within the bufferpool where the block can be found
    private Buffer[] bufferpool;
    private int numAvailable;
+   private LinkedList<Integer> freeFrames;
+   private Hashtable<Block, Integer> blockFrame;
    
    /**
     * Creates a buffer manager having the specified number 
@@ -27,10 +34,27 @@ class BasicBufferMgr {
    BasicBufferMgr(int numbuffs) {
       bufferpool = new Buffer[numbuffs];
       numAvailable = numbuffs;
-      for (int i=0; i<numbuffs; i++)
-         bufferpool[i] = new Buffer();
+      // CS4432-Project1: Keep track of the free frames by assigning
+      freeFrames = new LinkedList<Integer>();
+
+      // CS4432-Project1: Modified to add the indices to the LinkedList of freeFrames
+      for (int i = 0; i < numbuffs; i++) {
+         bufferpool[i] = new Buffer(i);
+         freeFrames.add(i);
+      }
+      // CS4432-Project1: Initialize Hashtable, which size of numbuffs
+      blockFrame = new Hashtable<Block, Integer>(numbuffs);
+
    }
-   
+   // CS4432-Project1: toString for task 2.5
+   public String toString() {
+      String poolStatus = "";
+      for(Buffer buffer : bufferpool) {
+         poolStatus += buffer.toString() + "\n";
+      }
+      return poolStatus;
+   }
+
    /**
     * Flushes the dirty buffers modified by the specified transaction.
     * @param txnum the transaction's id number
@@ -57,6 +81,8 @@ class BasicBufferMgr {
          if (buff == null)
             return null;
          buff.assignToBlock(blk);
+         // CS4432-Project1: Whenever adding buffer, we must add it to the hashtable as well, a reference
+         blockFrame.put(blk, buff.getIndex());
       }
       if (!buff.isPinned())
          numAvailable--;
@@ -78,6 +104,8 @@ class BasicBufferMgr {
       if (buff == null)
          return null;
       buff.assignToNew(filename, fmtr);
+      // CS4432-Project1: Add the reference
+      blockFrame.put(buff.block(), buff.getIndex());
       numAvailable--;
       buff.pin();
       return buff;
@@ -90,6 +118,8 @@ class BasicBufferMgr {
    synchronized void unpin(Buffer buff) {
       buff.unpin();
       if (!buff.isPinned())
+         // CS4432-Project1: When unpinning a buffer, add to the list of free frames by its original index
+         freeFrames.add(buff.getIndex());
          numAvailable++;
    }
    
@@ -102,18 +132,44 @@ class BasicBufferMgr {
    }
    
    private Buffer findExistingBuffer(Block blk) {
-      for (Buffer buff : bufferpool) {
-         Block b = buff.block();
-         if (b != null && b.equals(blk))
-            return buff;
+      if (blockFrame.get(blk) != null) {
+         return bufferpool[blockFrame.get(blk)];
+      } else {
+         return null;
       }
-      return null;
    }
-   
+
+   // CS4432-Project1: Redefined method to obtain the first free buffer frame more efficiently.
+   // Get the first element in the newly created list, if there is one.
+   // If true, then return the buffer from the bufferpool with the found index from the linked list, else null
    private Buffer chooseUnpinnedBuffer() {
-      for (Buffer buff : bufferpool)
-         if (!buff.isPinned())
-         return buff;
+      Integer freeIndex = freeFrames.getFirst();
+      freeFrames.removeFirst();
+
+      // CS4432-Project1: If the list of freeFrames is returning null, we must decide how to replace the buffer
+      if (numAvailable == 0) {
+         freeIndex = null;
+      }
+      if (freeIndex != null) {
+         // CS4432-Project1: Storing the lastTimeUsed to LRU
+         Date lastUsed = bufferpool[0].getLastTimeUsed();
+         int lastUsedIndex = 0;
+         for(int i = 0; i < bufferpool.length; i++) {
+            // CS4432-Project1: Compare the buffer to the other potential options. Make sure not pinned, and then check
+            //  against the currently maintained lastTimeUsed for LRU implementation
+            if(!bufferpool[i].isPinned() && bufferpool[i].getLastTimeUsed().compareTo(lastUsed) < 0) {
+               lastUsed = bufferpool[i].getLastTimeUsed();
+               lastUsedIndex = i;
+            }
+         }
+         Buffer buffer = bufferpool[lastUsedIndex];
+
+         if(buffer.block() != null) {
+            blockFrame.remove(buffer.block());
+         }
+         return buffer;
+//         return bufferpool[lastUsedIndex];
+      }
       return null;
    }
 }

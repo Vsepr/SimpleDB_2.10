@@ -1,5 +1,6 @@
 package simpledb.buffer;
 
+import java.util.*;
 import simpledb.server.SimpleDB;
 import simpledb.file.*;
 
@@ -16,6 +17,11 @@ import simpledb.file.*;
 public class Buffer {
    private Page contents = new Page();
    private Block blk = null;
+   // CS4432-Project1: Add a field to store the index in the bufferpool, for future usage in other methods
+   //                  Also keep track of the 'date' last modified for LRU, and a dirty bit
+   private int bufferIndex;
+   private Date lastTimeUsed;
+   private int dirtyBit = 0;
    private int pins = 0;
    private int modifiedBy = -1;  // negative means not modified
    private int logSequenceNumber = -1; // negative means no corresponding log record
@@ -26,7 +32,7 @@ public class Buffer {
     * This constructor is called exclusively by the 
     * class {@link BasicBufferMgr}.   
     * It depends on  the 
-    * {@link simpledb.log.LogMgr LogMgr} object 
+    * {@link simpledb.log.LogMgr LogMgr} object
     * that it gets from the class
     * {@link simpledb.server.SimpleDB}.
     * That object is created during system initialization.
@@ -34,8 +40,31 @@ public class Buffer {
     * {@link simpledb.server.SimpleDB#initFileAndLogMgr(String)} or
     * is called first.
     */
-   public Buffer() {}
-   
+
+   // CS4432-Project1: add the necessity for a buffer to also be given an index
+   public Buffer(int index) {
+      bufferIndex = index;
+      lastTimeUsed = new Date();
+   }
+
+   // CS4432-Project1: Getter method to get the index of a buffer
+   public Integer getIndex() {
+      return bufferIndex;
+   }
+
+   // CS4432-Project1: toString for task 2.5
+   public String toString() {
+      String info = "";
+
+      // Consider adding more fields that we want to see
+      if (blk != null) {
+         info += "Buffer ID:\t" + bufferIndex + "\t Block:\t" + blk + "\t Pin(s):\t" + pins + "\n";
+      } else {
+         info += "No block.\n";
+      }
+      return info;
+   }
+
    /**
     * Returns the integer value at the specified offset of the
     * buffer's page.
@@ -186,5 +215,10 @@ public class Buffer {
       fmtr.format(contents);
       blk = contents.append(filename);
       pins = 0;
+   }
+
+   // CS4432-Project1: Get the actual timestamp of the last time the buffer was used/changed
+   Date getLastTimeUsed() {
+      return lastTimeUsed;
    }
 }
