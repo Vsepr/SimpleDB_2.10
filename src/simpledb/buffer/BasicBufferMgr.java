@@ -31,6 +31,7 @@ class BasicBufferMgr {
     * @param numbuffs the number of buffer slots to allocate
     */
    BasicBufferMgr(int numbuffs) {
+      System.out.println("Creating the basic buffer manager with " + numbuffs + " buffers.");
       bufferpool = new Buffer[numbuffs];
       numAvailable = numbuffs;
       // CS4432-Project1: Keep track of the free frames by assigning
@@ -81,16 +82,25 @@ class BasicBufferMgr {
    synchronized Buffer pin(Block blk) {
       Buffer buff = findExistingBuffer(blk);
       if (buff == null) {
+         System.out.println("the block does not exist, finding an unpinned buffer");
          buff = chooseUnpinnedBuffer();
-         if (buff == null)
+         if (buff == null) {
+            System.out.println("Choose unpinned buffer returned null");
             return null;
+         }
          buff.assignToBlock(blk);
+         System.out.println("assigned block " + blk + " to buffer index " + buff.getIndex());
          // CS4432-Project1: Whenever adding buffer, we must add it to the hashtable as well, a reference
          blockFrame.put(blk, buff.getIndex());
       }
       if (!buff.isPinned())
+         System.out.println("Buffer is not pinned! Updating numAvailable from " + numAvailable + " to " + (numAvailable - 1));
          numAvailable--;
       buff.pin();
+      System.out.println("Pinned buff!");
+      //System.out.println("Pinning block " + blk + " to index number " + buff.getIndex() + ".");
+      System.out.println("Number of buffers available after pin: " + numAvailable);
+      System.out.println("Current buffer: " + blockFrame);
       return buff;
    }
 
@@ -113,6 +123,8 @@ class BasicBufferMgr {
       blockFrame.put(buff.block(), buff.getIndex());
       numAvailable--;
       buff.pin();
+      //System.out.println("Pinning block " + buff.block() + " to index number " + buff.getIndex() + ".");
+      System.out.println("Number of buffers available after pinNew: " + numAvailable);
       return buff;
    }
 
@@ -126,6 +138,8 @@ class BasicBufferMgr {
          // CS4432-Project1: When unpinning a buffer, add to the list of free frames by its original index
          freeFrames.add(buff.getIndex());
       numAvailable++;
+      //System.out.println("Unpinning buffer " + buff + " at index " + buff.getIndex() + ".");
+      System.out.println("Number of available buffers after unpin: " + numAvailable + ".");
    }
 
    /**
@@ -146,38 +160,15 @@ class BasicBufferMgr {
    }
 
    private Buffer chooseUnpinnedBuffer() {
-//      Integer freeIndex = freeFrames.getFirst();
-//      freeFrames.removeFirst();
-//
-//      // CS4432-Project1: If the list of freeFrames is returning null, we must decide how to replace the buffer
-////      if (numAvailable == 0) {
-////         freeIndex = null;
-////      }
-////      if (freeIndex != null) {
-//         // CS4432-Project1: Storing the lastTimeUsed to LRU
-//         Date lastUsed = bufferpool[0].getLastTimeUsed();
-//         int lastUsedIndex = 0;
-//         for(int i = 0; i < bufferpool.length; i++) {
-//            // CS4432-Project1: Compare the buffer to the other potential options. Make sure not pinned, and then check
-//            //  against the currently maintained lastTimeUsed for LRU implementation
-//            if(!bufferpool[i].isPinned() && bufferpool[i].getLastTimeUsed().compareTo(lastUsed) < 0) {
-//               lastUsed = bufferpool[i].getLastTimeUsed();
-//               lastUsedIndex = i;
-//            }
-//         }
-//         Buffer buffer = bufferpool[lastUsedIndex];
-//
-//         if(buffer.block() != null) {
-//            blockFrame.remove(buffer.block());
-//         }
-//         return buffer;
-////         return bufferpool[lastUsedIndex];
-////      }
+      //System.out.println("Trying to find a free space for buffer.");
       Integer freeSpace = freeFrames.getFirst();
       freeFrames.removeFirst();
 
+      System.out.println("Free spaces in buffer: " + numAvailable);
+
       if(freeSpace == null) {
          if(numAvailable == 0) {
+            System.out.println("No free space in buffer! Using LRU to remove buffer.");
             freeSpace = null;
          } else {
             int index = 0;
@@ -189,6 +180,7 @@ class BasicBufferMgr {
                   lruIndex = index;
                }
             }
+            System.out.println("Least recently used buffer: " + bufferpool[lruIndex]);
             return bufferpool[lruIndex];
          }
       } else {
@@ -201,9 +193,5 @@ class BasicBufferMgr {
       }
       return null;
 
-//      for (Buffer buff : bufferpool)
-//         if (!buff.isPinned())
-//            return buff;
-//      return null;
    }
 }
