@@ -8,6 +8,8 @@ import simpledb.record.*;
 import simpledb.index.Index;
 import simpledb.index.hash.HashIndex; 
 import simpledb.index.btree.BTreeIndex; //in case we change to btree indexing
+//TODO: extensibleHash Implementation
+//import simpledb.index.hash.ExtensibleHashIndex;
 
 
 /**
@@ -19,7 +21,7 @@ import simpledb.index.btree.BTreeIndex; //in case we change to btree indexing
  * @author Edward Sciore
  */
 public class IndexInfo {
-   private String idxname, fldname;
+   private String idxname, fldname, indexType;
    private Transaction tx;
    private TableInfo ti;
    private StatInfo si;
@@ -31,10 +33,11 @@ public class IndexInfo {
     * @param fldname the name of the indexed field
     * @param tx the calling transaction
     */
-   public IndexInfo(String idxname, String tblname, String fldname,
+   public IndexInfo(String idxname, String tblname, String fldname, String indexType,
                     Transaction tx) {
       this.idxname = idxname;
       this.fldname = fldname;
+      this.indexType = indexType;
       this.tx = tx;
       ti = SimpleDB.mdMgr().getTableInfo(tblname, tx);
       si = SimpleDB.mdMgr().getStatInfo(tblname, ti, tx);
@@ -47,7 +50,18 @@ public class IndexInfo {
    public Index open() {
       Schema sch = schema();
       // Create new HashIndex for hash indexing
-      return new HashIndex(idxname, sch, tx);
+//      return new HashIndex(idxname, sch, tx);
+      switch(indexType) {
+         case "sh":
+            return new HashIndex(idxname, sch, tx);
+         case "bt":
+            return new BTreeIndex(idxname, sch, tx);
+         //TODO: EH implementation
+         case "eh":
+            return new HashIndex(idxname, sch, tx);
+         default:
+            return new HashIndex(idxname, sch, tx);
+      }
    }
    
    /**

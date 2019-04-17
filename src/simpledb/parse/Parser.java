@@ -239,7 +239,8 @@ public class Parser {
       lex.eatDelim('(');
       String fldname = field();
       lex.eatDelim(')');
-      return new CreateIndexData(idxname, tblname, fldname);
+      String indexType = lex.eatId();
+      return new CreateIndexData(idxname, tblname, fldname, indexType);
    }
 }
 
