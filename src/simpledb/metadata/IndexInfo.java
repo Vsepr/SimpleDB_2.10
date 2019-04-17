@@ -56,7 +56,7 @@ public class IndexInfo {
             return new HashIndex(idxname, sch, tx);
          case "bt":
             return new BTreeIndex(idxname, sch, tx);
-         //TODO: EH implementation
+         //TODO: EH implementation, also change default to sh eventually.
          case "eh":
             return new HashIndex(idxname, sch, tx);
          default:
