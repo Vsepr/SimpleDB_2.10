@@ -51,14 +51,22 @@ public class IndexInfo {
       Schema sch = schema();
       // Create new HashIndex for hash indexing
 //      return new HashIndex(idxname, sch, tx);
-      switch(indexType) {
-         case "bt":
-            return new BTreeIndex(idxname, sch, tx);
-         case "eh":
-            return new ExtensibleHash(idxname, sch, tx);
-         default:
-            return new HashIndex(idxname, sch, tx);
+//      switch(indexType) {
+//         case "bt":
+//            return new BTreeIndex(idxname, sch, tx);
+//         case "eh":
+//            return new ExtensibleHash(idxname, sch, tx);
+//         default:
+//            return new HashIndex(idxname, sch, tx);
+//      }
+      if(indexType == "sh") {
+         return new HashIndex(idxname, sch, tx);
       }
+      if(indexType == "bt") {
+         return new BTreeIndex(idxname, sch, tx);
+      } else {
+         System.out.println("WE ARE MAKING NEW EHASH");
+         return new ExtensibleHash(idxname, sch, tx);      }
    }
    
    /**

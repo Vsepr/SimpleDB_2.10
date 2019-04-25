@@ -5,7 +5,7 @@ import java.sql.Statement;
 import java.util.Random;
 import simpledb.remote.SimpleDriver;
 public class CreateTestTables {
-    final static int maxSize=20000;
+    final static int maxSize=10;
     /**
      * @param args
      */
@@ -55,7 +55,7 @@ public class CreateTestTables {
                     rand=new Random(1);// ensure every table gets the same data
                     for(int j=0;j<maxSize;j++)
                     {
-                        s.executeUpdate("insert into test"+i+" (a1,a2) values("+rand.nextInt(1000)+","+rand.nextInt(1000)+ ")");
+                        s.executeUpdate("insert into test"+i+" (a1,a2) values("+rand.nextInt(1)+","+rand.nextInt(1)+ ")");
                     }
                 }
                 else//case where i=5
@@ -67,35 +67,36 @@ public class CreateTestTables {
                 }
             }
 
-            long startTime1 = System.nanoTime();
-            String query = "select a1,a2 from test1 where a1 = 250";
-            s.executeUpdate(query);
-            long endTime1   = System.nanoTime();
-            long totalTime1 = endTime1 - startTime1;
-            System.out.println("Running time for test1 is:"+totalTime1);
+//            long startTime = System.nanoTime();
+//            String query = "select a1,a2 from test1 where a1 = 20";
+//            s.executeQuery(query);
+//            long endTime   = System.nanoTime();
+//            long totalTime = endTime - startTime;
+//            System.out.println("Running time for test1 is:"+totalTime);
 
-/*
+//
             long startTime1 = System.nanoTime();
-            s.executeUpdate("SELECT a1,a2 from test5, test1 where test5.a1 = test1.a1");
+            String query = "select a1, a2 from test1, test5 where a1 = test5.a1";
+            s.executeQuery(query);
             long endTime1   = System.nanoTime();
             long totalTime1 = endTime1 - startTime1;
             System.out.println("Running time for test1 is:"+totalTime1);
-            long startTime2 = System.nanoTime();
-            s.executeUpdate("SELECT a1,a2 from test5, test2 where test5.a1 = test2.a1");
-            long endTime2   = System.nanoTime();
-            long totalTime2 = endTime2 - startTime2;
-            System.out.println("Running time for test2 is:"+totalTime2);
-            long startTime3 = System.nanoTime();
-            s.executeUpdate("SELECT a1,a2 from test5, test3 where test5.a1 = test3.a1");
-            long endTime3   = System.nanoTime();
-            long totalTime3 = endTime3 - startTime3;
-            System.out.println("Running time for test3 is:"+totalTime3);
-            long startTime4 = System.nanoTime();
-            s.executeUpdate("SELECT a1,a2 from test5, test4 where test5.a1 = test4.a1");
-            long endTime4   = System.nanoTime();
-            long totalTime4 = endTime4 - startTime4;
-            System.out.println("Running time for test4 is:"+totalTime4);
-*/
+//            long startTime2 = System.nanoTime();
+//            s.executeUpdate("SELECT a1,a2 from test5, test2 where test5.a1 = test2.a1");
+//            long endTime2   = System.nanoTime();
+//            long totalTime2 = endTime2 - startTime2;
+//            System.out.println("Running time for test2 is:"+totalTime2);
+//            long startTime3 = System.nanoTime();
+//            s.executeUpdate("SELECT a1,a2 from test5, test3 where test5.a1 = test3.a1");
+//            long endTime3   = System.nanoTime();
+//            long totalTime3 = endTime3 - startTime3;
+//            System.out.println("Running time for test3 is:"+totalTime3);
+//            long startTime4 = System.nanoTime();
+//            s.executeUpdate("SELECT a1,a2 from test5, test4 where test5.a1 = test4.a1");
+//            long endTime4   = System.nanoTime();
+//            long totalTime4 = endTime4 - startTime4;
+//            System.out.println("Running time for test4 is:"+totalTime4);
+
 
             conn.close();
 
