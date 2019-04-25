@@ -50,8 +50,8 @@ public class ExtensibleHash implements Index {
     public void beforeFirst(Constant key) {
         // if global depth is 1 (starts on 1), then it is new and we must create from scratch. Change value after
         if(start == 1) {
-            Bucket bucket1 = new Bucket(1, KEYS);
-            Bucket bucket2 = new Bucket(2, KEYS);
+            Bucket bucket1 = new Bucket(0, KEYS);
+            Bucket bucket2 = new Bucket(1, KEYS);
             buckets.add(bucket1);
             buckets.add(bucket2);
             start = -1;
